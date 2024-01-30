@@ -159,3 +159,15 @@ void Server::shutdownSrv()
 	string outmessage2 = "Sunucu kapatıldı.\n";
 	write(STDOUT_FILENO, outmessage2.c_str(), outmessage2.size());
 }
+
+int error(const char *msg, const char *err, const char *err2)
+{
+    if(msg)
+        std::cerr << msg;
+    if(err)
+        std::cerr << err;
+    if(err2)
+        std::cerr << err2;
+    std::cerr << std::endl;
+    return 1;
+}

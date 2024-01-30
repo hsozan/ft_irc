@@ -1,4 +1,4 @@
-NAME		= ircserv
+NAME		= Ircserv
 
 CC			= g++ -std=c++98
 FLAGS		= -Wall -Wextra -Werror
@@ -14,7 +14,8 @@ OBJ			= $(SRC:src/%.cpp=obj/%.o)
 all			: $(NAME)
 
 $(NAME)		: obj $(OBJ)
-	$(CC) $(FLAGS) obj/*.o obj/Commands/*.o main.cpp -o $(NAME)
+	@$(CC) $(FLAGS) obj/*.o obj/Commands/*.o main.cpp -o $(NAME)
+	@echo "\033[32mIRCserv \033[0m\033[1;32mCompilation OK\033[0m"
 
 obj			:
 	mkdir -p obj
@@ -24,11 +25,11 @@ obj/%.o		: src/%.cpp
 	$(CC) $(FLAGS) -c $< -o $@
 
 clean		:
-	rm -rf log.log
-	rm -rf error.log
-	rm -rf $(NAME)
+	@rm -rf log.log
+	@rm -rf error.log
+	@rm -rf $(NAME)
 
 fclean		: clean
-	rm -rf obj
+	@rm -rf obj
 
 re			: clean all

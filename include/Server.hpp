@@ -18,10 +18,13 @@
 #include "Channel.hpp"
 #include "Commands.hpp"
 #include <sstream>
+#include "Colours.hpp"
+
 
 class Client;
 class Channel;
 class Bot;
+int error(const char *msg, const char *err, const char *err2);
 
 using namespace std;
 
@@ -82,7 +85,6 @@ class Server
 		void removeChannel(const string& channel );
 		void processPartialCommands(int clientSocketFD);
 		Bot* getBot() { return _bot; }
-
 };
 
 #endif

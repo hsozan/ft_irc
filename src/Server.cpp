@@ -105,6 +105,7 @@ void Server::socketBind()
 			{
 				close(_serverSocketFD);
 				ErrorLogger(FAILED_SOCKET_BIND, __FILE__, __LINE__);
+				exit(1);
 			}
 
 }
@@ -175,7 +176,6 @@ int Server::socketAccept()
 	client->sendMessage("Enter the server password using /PASS");
 
 	log(messageStream.str());
-
 	return clientSocketFD;
 }
 // Mevcut bağlantıları dinler 
@@ -226,7 +226,6 @@ void Server::serverRun()
 					handleClient((*it).second->getClientSocketFD());
 					break;
 				}
-				
 			}
 			if (FD_ISSET(_bot->getSocket(), &read_set))
 				_bot->listen();
