@@ -19,16 +19,10 @@ void Server::removeChannel(const std::string& channelName)
 			_channels.erase(it);
 		}
 		else
-		{
-			string message = "Channel " + channelName + " is already null.";
-			write(STDOUT_FILENO, message.c_str(), message.size());
-		}
+			std::cout << "Channel " + channelName + " is already null." << std::endl;
 	}
 	else
-	{
-		string message = "Channel " + channelName + " does not exist.";
-		write(STDOUT_FILENO, message.c_str(), message.size());
-	}
+		std::cout << "Channel " + channelName + " does not exist."<< std::endl;
 }
 
 // İstemciyi tüm kanallardan çıkar.
@@ -61,8 +55,7 @@ void Server::removeClientFromAllChannels(Client* client)
 			// Eğer kanalda hiç kullanıcı kalmamışsa ve kanal hala varsa, kanalı kaldır.
 			if (channel->getChannelClientCount() == 0 && channelExists(channel->getChannelName()))
 			{
-				string message = "Channel " + channelName + " is empty, deleting.\n";
-				write(STDOUT_FILENO, message.c_str(), message.size());
+				std::cout << "Channel " + channelName + " is empty, deleting."<< std::endl;
 				removeChannel(channelName);
 			}
 		}

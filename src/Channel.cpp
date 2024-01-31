@@ -93,10 +93,7 @@ bool Channel::isUserOnChannel(Client* client) const
 void Channel::setUpModeChannel(Channel* channel, Client* client, string& mode, string& modeParams)
 {
 	if (!channel || !client)
-	{
-		write(2, "Channel or Client is null, cannot set mode.", 43);
-		return;
-	}
+		error(RED, "Channel or Client is null, cannot set mode.", RESET);
 	if (mode == "+k" && (client->isOperator() == true))
 	{
 		channel->setChannelKey(modeParams);
@@ -138,10 +135,7 @@ void Channel::setUpModeChannel(Channel* channel, Client* client, string& mode, s
 void Channel::setLowModeChannel(Channel* channel, Client* client, string& mode, string& modeParams)
 {
 	if (!channel || !client)
-	{
-		write(2, "Channel or Client is null, cannot set mode.", 43);
-		return;
-	}
+		error(RED, "Channel or Client is null, cannot set mode.", RESET);
 	if (mode == "-k" && (client->isOperator() == true))
 	{
 		channel->setChannelKey("");

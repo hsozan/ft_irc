@@ -63,13 +63,13 @@ void Server::socketStart()
 	_serverSocketFD = socket(_serverSocketFamily, _serverSocketProtocol, 0);
 
 	if (_serverSocketFD == -1)
-		ErrorLogger(FAILED_SOCKET, __FILE__, __LINE__);
+		ErrorLogger(FAILED_SOCKET, __FILE__, __LINE__, false);
 
 	// Soketi non-blocking moda ayarlar.
 	if (fcntl(_serverSocketFD, F_SETFL, O_NONBLOCK) == -1)
 	{
 		close(_serverSocketFD);
-		ErrorLogger(FAILED_SOCKET_NONBLOCKING, __FILE__, __LINE__);
+		ErrorLogger(FAILED_SOCKET_NONBLOCKING, __FILE__, __LINE__, false);
 	}
 
 	// Soketin tekrar kullanılabilir olmasını sağlar.
@@ -77,7 +77,7 @@ void Server::socketStart()
 	if (setsockopt(_serverSocketFD, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(int)) == -1)
 	{
 		close(_serverSocketFD);
-		ErrorLogger(FAILED_SOCKET_OPTIONS, __FILE__, __LINE__);
+		ErrorLogger(FAILED_SOCKET_OPTIONS, __FILE__, __LINE__, false);
 	}
 }
 
@@ -94,7 +94,7 @@ void Server::socketInit()
 			
 		default:
 			close(_serverSocketFD);
-			ErrorLogger(FAILED_SOCKET_DOMAIN, __FILE__, __LINE__);
+			ErrorLogger(FAILED_SOCKET_DOMAIN, __FILE__, __LINE__, false);
 	}
 }
 // AF_INET Bağlantı noktasını belirtmek için server soketinin adresini bağlar.
@@ -104,7 +104,7 @@ void Server::socketBind()
 			if (::bind(_serverSocketFD, reinterpret_cast<struct sockaddr*>(&serverAddress), sizeof(serverAddress)) == -1)
 			{
 				close(_serverSocketFD);
-				ErrorLogger(FAILED_SOCKET_BIND, __FILE__, __LINE__);
+				ErrorLogger(FAILED_SOCKET_BIND, __FILE__, __LINE__, false);
 				exit(1);
 			}
 
@@ -116,7 +116,7 @@ void Server::socketListen()
 	if ( listen(_serverSocketFD, BACKLOG_SIZE) == -1 )
 	{
 		close(_serverSocketFD);
-		ErrorLogger(FAILED_SOCKET_LISTEN, __FILE__, __LINE__);
+		ErrorLogger(FAILED_SOCKET_LISTEN, __FILE__, __LINE__, false);
 	}
 
 	FD_SET(_serverSocketFD, &read_set);
@@ -147,7 +147,7 @@ int Server::socketAccept()
 	if (fcntl(clientSocketFD, F_SETFL, O_NONBLOCK) == -1)
 	{
 		close(clientSocketFD);
-		ErrorLogger(FAILED_SOCKET_NONBLOCKING, __FILE__, __LINE__);
+		ErrorLogger(FAILED_SOCKET_NONBLOCKING, __FILE__, __LINE__, false);
 	}
 
 	// Soketin tekrar kullanılabilir olmasını sağlar.
@@ -155,7 +155,7 @@ int Server::socketAccept()
 	if (setsockopt(clientSocketFD, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(int)) == -1)
 	{
 		close(clientSocketFD);
-		ErrorLogger(FAILED_SOCKET_OPTIONS, __FILE__, __LINE__);
+		ErrorLogger(FAILED_SOCKET_OPTIONS, __FILE__, __LINE__, false);
 	}
 
 	char hostname[NI_MAXHOST];
@@ -198,7 +198,7 @@ void Server::serverRun()
 		// Bot oluşturulamazsa, hata mesajı yazdırılır.
 		delete _bot;
 		_bot = NULL;
-		write(STDOUT_FILENO, e.what(), strlen(e.what()));
+		std::cout << e.what() << std::endl;
 	}
 
 	// Ana döngü olayları dinler.

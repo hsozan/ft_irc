@@ -1,5 +1,38 @@
 #include "../include/Server.hpp"
 
+void ErrorLogger( string messageInfo, const char* fileInfo, int lineInfo, bool isFatal)
+{
+	ofstream errorLog;
+
+	errorLog.open("error.log", ios::app);
+	errorLog << "Error Time: " << __TIME__ << endl;
+	errorLog << "Error in file: " << fileInfo << ":" << lineInfo << endl;
+	errorLog << "Error info: " << string(strerror(errno)) << endl;
+	errorLog << "----------------------------------------" << endl;
+	errorLog.close();
+
+	if (isFatal) {
+		throw runtime_error(messageInfo);
+	}
+	std::cout << messageInfo << std::endl;
+}
+
+void log(const string& message) {
+	char buffer[100];
+	time_t currentTime = time(NULL);
+	ofstream logFile;
+
+
+	strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", localtime(&currentTime));
+	string timeStr(buffer);
+
+	logFile.open("log.log", std::ios::app);
+	logFile << timeStr << " " << message << std::endl;
+	logFile.close();
+
+	std::cout << "\033[0;34m[" << timeStr << "]\033[0m " << message << std::endl;
+}
+
 // Partial komutları işler
 // İstemci soket dosya tanımlayıcısını alır ve tamamlanmamış komutları işler.
 void Server::processPartialCommands(int clientSocketFD)
@@ -60,7 +93,7 @@ void Server::handleClient(int clientSocketFD)
 			if (errno != EAGAIN && errno != EWOULDBLOCK) {
 				// Hata durumunda
 				FD_CLR(clientSocketFD, &read_set);
-				ErrorLogger("recv error", __FILE__, __LINE__);
+				ErrorLogger("recv error", __FILE__, __LINE__, false);
 				close(clientSocketFD);
 				clientBuffers.erase(clientSocketFD);
 			}
@@ -77,7 +110,7 @@ void Server::clientDisconnect(int clientSocketFD)
         // İstemci haritasında istemci aranır ve bulunursa işlemler gerçekleştirilir.
         std::map<int, Client*>::iterator it = _clients.find(clientSocketFD);
         if (it == _clients.end()) {
-            write(STDOUT_FILENO, "Client not found for removal.\n", 30);
+            error(RED, "Client not found in client map.\n", RESET);
             return;
         }
 
@@ -99,7 +132,7 @@ void Server::clientDisconnect(int clientSocketFD)
     }
     catch (const std::exception &e)
     {
-        write(STDOUT_FILENO, e.what(), strlen(e.what()));
+        std::cout << e.what() << std::endl;
     }
 }
 
@@ -124,15 +157,14 @@ void Server::signalHandler(int signum)
 // Tüm kanalları kaldırır ve bağlantıyı kapatır.
 void Server::shutdownSrv()
 {
-	string outmessage = "Sunucu kapatılıyor...\n";
-	write(STDOUT_FILENO, outmessage.c_str(), outmessage.size());
+	std::cout << "Shutting down server..." << std::endl;
 
 	// Tüm istemciler için işlemler gerçekleştirilir.
 	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
 		Client* client = it->second;
 		if (client != NULL) {
 			// İstemciye kapatılma mesajı gönderilir ve tüm kanallardan çıkarılır.
-			client->sendMessage("Sunucu kapatılıyor. Bağlantınız sonlandırılıyor.");
+			client->sendMessage("ERROR :Closing Link: " + client->getHostName() + " (Server shutdown)");
 			removeClientFromAllChannels(client);
 			close(it->first);
 			delete client;
@@ -156,8 +188,7 @@ void Server::shutdownSrv()
 
 	// Bellekte sızıntı kontrolü yapılır.
 	//system("leaks ircserv"); //control c yapınca leaks bilgisi görmek istiyorsanız bunu açın
-	string outmessage2 = "Sunucu kapatıldı.\n";
-	write(STDOUT_FILENO, outmessage2.c_str(), outmessage2.size());
+	std::cout << "Server shutdown complete." << std::endl;
 }
 
 int error(const char *msg, const char *err, const char *err2)
@@ -169,5 +200,6 @@ int error(const char *msg, const char *err, const char *err2)
     if(err2)
         std::cerr << err2;
     std::cerr << std::endl;
-    return 1;
+	exit(1);
+	return 1;
 }

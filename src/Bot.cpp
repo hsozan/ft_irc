@@ -26,10 +26,7 @@ void Bot::connectServ()
 
 	host = gethostbyname(serv.c_str());
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
-	{
-		write(STDOUT_FILENO, "Error: Bot socket creation failed.\n", 34);
-		exit(1);
-	}
+		error(RED, FAILED_SOCKET, RESET);
 
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(port);
@@ -37,16 +34,10 @@ void Bot::connectServ()
 	memset(&(server_addr.sin_zero), '\0', 8);
 
 	if (connect(sock, (struct sockaddr *)&server_addr, sizeof(struct sockaddr)) == -1)
-	{
-		write(STDOUT_FILENO, "Error: Bot socket connection failed.\n", 36);
-		exit(1);
-	}
+		error(RED, FAILED_SOCKET_CONNECT, RESET);
 
 	if (fcntl(sock, F_SETFL, O_NONBLOCK) == -1)
-	{
-		write(STDOUT_FILENO, "Error: Bot socket fcntl failed.\n", 32);
-		exit(1);
-	}
+		error(RED, FAILED_SOCKET_NONBLOCKING, RESET);
 
 	if (sock != -1)
 	{
@@ -68,14 +59,10 @@ void Bot::listen()
 	if (bytes_read < 0)
 	{
 		string errrecv = "Error in recv: " + string(strerror(errno)) + "\n";
-		write(STDOUT_FILENO, errrecv.c_str(), errrecv.length());
-		return;
+		error(RED, errrecv.c_str(), RESET);
 	}
 	else if (bytes_read == 0)
-	{
-		write(STDOUT_FILENO, "Connection closed by peer.\n", 27);
-		return;
-	}
+		error(RED, "Connection closed by peer.\n", RESET);
 	buffer[bytes_read] = '\0';
 	accumulated += buffer;
 

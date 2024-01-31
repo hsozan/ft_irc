@@ -5,10 +5,7 @@ void User::user(Client *client, vector<string> commandParts, Server *srv)
 {
     // client veya srv boş ise hata mesajı yazdır ve çık
     if (!client || !srv)
-    {
-        write(2, "Error: client or srv is null\n", 29);
-        return;
-    }
+    error(RED, "Error: client or srv is null\n", RESET);
 
     // Eğer kullanıcı zaten kayıtlı ise hata mesajı gönder ve çık
     if (client->isRegistered())

@@ -67,8 +67,7 @@ void Part::partChannel(Client* client, string channelName, Server* srv)
     {
         // Kanalı sil
    		string channelName = channel->getChannelName();
-		string message = "Channel " + channelName + " is empty, deleting.\n";
-		write( 1, message.c_str(), message.length() );
+		std::cout<< "Channel " + channelName + " is empty, deleting."<< std::endl;
 		srv->removeChannel( channelName );
     }
 }

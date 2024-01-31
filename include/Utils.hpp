@@ -67,42 +67,6 @@ using namespace std;
 #define ERR_NOCANNOTSENDTOCHAN(source, channel) "404 " + source + " " + channel + " :Cannot send to channel"
 #define ERR_NOKICKCHANNELOWNER(source, channel) source + " " + channel + " :Cannot kick to channel owner!"
 
-static inline void ErrorLogger( string messageInfo, const char* fileInfo, int lineInfo, bool isFatal = false )
-{
-	ofstream errorLog;
-
-	errorLog.open("error.log", ios::app);
-	errorLog << "Error Time: " << __TIME__ << endl;
-	errorLog << "Error in file: " << fileInfo << ":" << lineInfo << endl;
-	errorLog << "Error info: " << string(strerror(errno)) << endl;
-	errorLog << "----------------------------------------" << endl;
-	errorLog.close();
-
-	if (isFatal) {
-		throw runtime_error(messageInfo);
-	}
-	write(STDERR_FILENO, messageInfo.c_str(), messageInfo.length());
-}
-
-static inline void log(const string& message) {
-	char buffer[100];
-	time_t currentTime = time(NULL);
-	ofstream logFile;
-
-
-	strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", localtime(&currentTime));
-	string timeStr(buffer);
-
-	logFile.open("log.log", std::ios::app);
-	logFile << timeStr << " " << message << std::endl;
-	logFile.close();
-
-
-	ostringstream oss;
-	oss << "\033[0;34m[" << timeStr << "]\033[0m " << message << std::endl;
-
-	string outputStr = oss.str();
-	write(STDOUT_FILENO, outputStr.c_str(), outputStr.size());
-}
-
+void log(const string& message);
+void ErrorLogger( string messageInfo, const char* fileInfo, int lineInfo, bool isFatal);
 #endif

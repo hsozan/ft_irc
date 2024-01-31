@@ -64,7 +64,7 @@ void Client::setNickName(const string& nickName)
 	else
 	{
 		string error = "Invalid nickname: " + nickName;
-		write(2, error.c_str(), error.length());
+		std::cout << error << std::endl;
 	}
 }
 
@@ -76,7 +76,7 @@ void Client::setUserName(const string& userName)
 	else
 	{
 		string error = "Invalid username: " + userName;
-		write(2, error.c_str(), error.length());
+		std::cout << error << std::endl;
 	}
 }
 
@@ -110,7 +110,7 @@ void Client::sendMessage(const string& message) const
 
 	// Sokete mesaj gönderilir, hata durumunda loglanır.
 	if (send(_clientSocketFD, buffer.c_str(), buffer.length(), 0) == -1)
-		ErrorLogger(FAILED_SOCKET_SEND, __FILE__, __LINE__);
+		ErrorLogger(FAILED_SOCKET_SEND, __FILE__, __LINE__, false);
 }
 
 // İstemciye bir yanıt gönderir.
