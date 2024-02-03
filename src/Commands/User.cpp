@@ -18,6 +18,7 @@ void User::user(Client *client, vector<string> commandParts, Server *srv)
     if (commandParts.size() < 3)
     {
         client->sendReply(ERR_NEEDMOREPARAMS(client->getNickName(), "USER"));
+        client->sendMessage("Usage: /USER <username> <realname>");
         return;
     }
 

@@ -32,4 +32,6 @@ void Pass::pass(Client *client, const vector<string> commandParts, Server *srv)
     client->setPass(true);
     // Kullanıcıya şifrenin kabul edildiğine dair mesaj gönder
     client->sendMessage("Password accepted!");
+    client->sendMessage("Please enter your nickname with /NICK command.");
+    client->sendMessage("Please enter your username and real name with /USER command.");
 }
