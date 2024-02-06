@@ -164,7 +164,7 @@ void Server::serverRun()
 		std::cout << e.what() << std::endl;
 	}
 
-	while (true)
+	for (;;)
 	{
 		int max_fd = _bot->getSocket();
 		int n = 0;
