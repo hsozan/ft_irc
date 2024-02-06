@@ -2,8 +2,6 @@
 
 Server* Server::ins = NULL;
 
-// Singleton tasarım deseni kullanılarak tek bir Server nesnesinin oluşturulması sağlanır.
-// Bu fonksiyon, Server sınıfının örneklemesini döndürür veya oluşturur.
 Server::Server(int serverSocketFamily, int serverSocketProtocol, int serverSocketPort, string serverName)
 	: _serverSocketFD(-1),
 	_serverSocketFamily(serverSocketFamily),
@@ -13,9 +11,8 @@ Server::Server(int serverSocketFamily, int serverSocketProtocol, int serverSocke
 	_serverPass(""),
 	_bot(NULL)
 {
-	// Ctrl+C sinyali alındığında tetiklenecek sinyal işleyici atanır.
 	signal(SIGINT, signalHandler);
-	Server::setInstance(this);	// Singleton
+	Server::setInstance(this);
 
 	memset(&serverAddress, 0, sizeof(serverAddress));
 
@@ -23,14 +20,11 @@ Server::Server(int serverSocketFamily, int serverSocketProtocol, int serverSocke
 
 }
 
-// Server nesnesinin yıkıcısı.
-// Ayrıca, Server sınıfının tek bir örneğini tutan işaretçi silinir ve bellek temizlenir.
 Server::~Server()
 {
 	delete Server::ins;
 	Server::ins = NULL;
 
-	// Tüm istemciler ve kanallar bellekten temizlenir.
 	for (map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
 		delete it->second;
 	}
@@ -39,40 +33,25 @@ Server::~Server()
 		delete it->second;
 	}
 	_channels.clear();
-
-	// Server soketi kapatılır.
 	if (_serverSocketFD != -1)
 		close(_serverSocketFD);
-
-
-	FD_ZERO(&read_set);
-
-	if (_bot != NULL){
+	if (_bot != NULL)
 		delete _bot;
-	}
-
+	FD_ZERO(&read_set);
 }
-// Server soketini oluşturur.
-// Soketin dosya tanımlayıcısını döndürür.
-// NONBLOCK -> Soketi engellemeyen (non-blocking) modda ayarlar, yani soketi bloklamadan okuma ve yazma işlemlerini gerçekleştirebiliriz.
-// reuse -> Soketi yeniden kullanılabilir (reusable) hale getirir.
-// reuse -> Bu, sunucunun hemen kapatıldıktan sonra yeniden başlatılabilmesi için gereklidir.
+
 void Server::socketStart()
 {
-	// Soket oluşturulur.
 	_serverSocketFD = socket(_serverSocketFamily, _serverSocketProtocol, 0);
 
 	if (_serverSocketFD == -1)
 		ErrorLogger(FAILED_SOCKET, __FILE__, __LINE__, false);
-
-	// Soketi non-blocking moda ayarlar.
 	if (fcntl(_serverSocketFD, F_SETFL, O_NONBLOCK) == -1)
 	{
 		close(_serverSocketFD);
 		ErrorLogger(FAILED_SOCKET_NONBLOCKING, __FILE__, __LINE__, false);
 	}
 
-	// Soketin tekrar kullanılabilir olmasını sağlar.
 	int reuse = 1;
 	if (setsockopt(_serverSocketFD, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(int)) == -1)
 	{
@@ -81,12 +60,11 @@ void Server::socketStart()
 	}
 }
 
-// Soketin gerekli bağlantı argümanlarını tanımlar.
 void Server::socketInit()
 {
 	switch (_serverSocketFamily)
 	{
-		case AF_INET: // IPv4
+		case AF_INET:
 			serverAddress.sin_addr.s_addr = INADDR_ANY;
 			serverAddress.sin_family = _serverSocketFamily;
 			serverAddress.sin_port = htons(_serverSocketPort);
@@ -97,17 +75,15 @@ void Server::socketInit()
 			ErrorLogger(FAILED_SOCKET_DOMAIN, __FILE__, __LINE__, false);
 	}
 }
-// AF_INET Bağlantı noktasını belirtmek için server soketinin adresini bağlar.
+
 void Server::socketBind()
 {
-
-			if (::bind(_serverSocketFD, reinterpret_cast<struct sockaddr*>(&serverAddress), sizeof(serverAddress)) == -1)
-			{
-				close(_serverSocketFD);
-				ErrorLogger(FAILED_SOCKET_BIND, __FILE__, __LINE__, false);
-				exit(1);
-			}
-
+	if (::bind(_serverSocketFD, reinterpret_cast<struct sockaddr*>(&serverAddress), sizeof(serverAddress)) == -1)
+	{
+		close(_serverSocketFD);
+		ErrorLogger(FAILED_SOCKET_BIND, __FILE__, __LINE__, false);
+		exit(1);
+	}
 }
 
 
@@ -118,10 +94,7 @@ void Server::socketListen()
 		close(_serverSocketFD);
 		ErrorLogger(FAILED_SOCKET_LISTEN, __FILE__, __LINE__, false);
 	}
-
 	FD_SET(_serverSocketFD, &read_set);
-
-	
 }
 
 
@@ -129,29 +102,21 @@ int Server::socketAccept()
 {
 	struct sockaddr_storage clientAddress;
 	socklen_t clientAddressLength = sizeof(clientAddress);
-
 	int clientSocketFD = accept(_serverSocketFD, (struct sockaddr *)&clientAddress, &clientAddressLength);
 
-	if (clientSocketFD < 0)
+	if (clientSocketFD == -1)
 	{
-		if (errno == EAGAIN || errno == EWOULDBLOCK)
-		{
-		}
-		else
-		{
-			ErrorLogger(FAILED_SOCKET_ACCEPT, __FILE__, __LINE__, true);
-		}
+		ErrorLogger(FAILED_SOCKET_ACCEPT, __FILE__, __LINE__, true);
+		return -1;
 	}
-
-	// Soketi non-blocking moda ayarlar.
 	if (fcntl(clientSocketFD, F_SETFL, O_NONBLOCK) == -1)
 	{
 		close(clientSocketFD);
 		ErrorLogger(FAILED_SOCKET_NONBLOCKING, __FILE__, __LINE__, false);
 	}
 
-	// Soketin tekrar kullanılabilir olmasını sağlar.
 	int reuse = 1;
+
 	if (setsockopt(clientSocketFD, SOL_SOCKET, SO_REUSEADDR, &reuse, sizeof(int)) == -1)
 	{
 		close(clientSocketFD);
@@ -159,6 +124,7 @@ int Server::socketAccept()
 	}
 
 	char hostname[NI_MAXHOST];
+
 	if (inet_ntop(AF_INET, &(((struct sockaddr_in *)&clientAddress)->sin_addr), hostname, sizeof(hostname)) == NULL)
 	{
 		ErrorLogger(FAILED_SOCKET_GETADDRINFO, __FILE__, __LINE__, true);
@@ -178,9 +144,7 @@ int Server::socketAccept()
 	log(messageStream.str());
 	return clientSocketFD;
 }
-// Mevcut bağlantıları dinler 
-// Yeni istemci bağlanır ve maksimum istemci sayısını kontrol eder.
-// Bot oluşturulur ve dinlenir.
+
 void Server::serverRun()
 {
 	socketStart();
@@ -195,13 +159,11 @@ void Server::serverRun()
 	}
 	catch (const std::exception &e)
 	{
-		// Bot oluşturulamazsa, hata mesajı yazdırılır.
 		delete _bot;
 		_bot = NULL;
 		std::cout << e.what() << std::endl;
 	}
 
-	// Ana döngü olayları dinler.
 	while (true)
 	{
 		int max_fd = _bot->getSocket();

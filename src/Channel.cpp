@@ -1,6 +1,5 @@
 #include "../include/Channel.hpp"
 
-// Kanal sınıfının yapıcı fonksiyonu
 Channel::Channel(const string& channelName, const string& channelKey, Client* channelOwner)
 	: _channelName(channelName),
 	  _channelOwner(channelOwner),
@@ -11,12 +10,10 @@ Channel::Channel(const string& channelName, const string& channelKey, Client* ch
 {
 }
 
-// Kanal sınıfının yıkıcı fonksiyonu
 Channel::~Channel()
 {
 }
 
-// Kanala mesajı yayınlayan fonksiyon
 void Channel::broadcastMessage(const string& message) const
 {
 	string tmp = message;
@@ -26,7 +23,6 @@ void Channel::broadcastMessage(const string& message) const
 	}
 }
 
-// Belirli bir istemici hariç tutarak kanala mesajı yayınlayan fonksiyon
 void Channel::broadcastMessage(const string& message, Client* exceptClient) const
 {
 	for (vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
@@ -36,13 +32,11 @@ void Channel::broadcastMessage(const string& message, Client* exceptClient) cons
 	}
 }
 
-// Kanala istemci ekleyen fonksiyon
 void Channel::addClient(Client* client)
 {
 	_clients.push_back(client);
 }
 
-// Kanaldan istemciyi kaldıran fonksiyon
 void Channel::removeUserFromChannel(Client* client)
 {
 	for (vector<Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it)
@@ -54,7 +48,6 @@ void Channel::removeUserFromChannel(Client* client)
 		}
 	}
 
-	// Kanal sahibi bir operatörse ve operatör olan tek kişi çıkarsa, yeni bir operatör belirle.
 	if (client->isOperator() == true)
 	{
 		client->setOperator(false);
@@ -64,7 +57,6 @@ void Channel::removeUserFromChannel(Client* client)
 				return;
 		}
 
-		// Eğer kanalda hala istemci varsa, ilk istemciyi yeni operatör yap.
 		if (_clients.size() > 0)
 		{
 			Client* newOperator = _clients.front();
@@ -78,7 +70,6 @@ void Channel::removeUserFromChannel(Client* client)
 	}
 }
 
-// Bir istemcinin kanalda olup olmadığını kontrol eden fonksiyon
 bool Channel::isUserOnChannel(Client* client) const
 {
 	for (vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
@@ -89,22 +80,24 @@ bool Channel::isUserOnChannel(Client* client) const
 	return false;
 }
 
-// Kanalın modlarını ayarlayan fonksiyon
 void Channel::setUpModeChannel(Channel* channel, Client* client, string& mode, string& modeParams)
 {
 	if (!channel || !client)
+	{
 		error(RED, "Channel or Client is null, cannot set mode.", RESET);
-	if (mode == "+k" && (client->isOperator() == true))
+	}
+
+	if (mode == "+k" && client->isOperator())
 	{
 		channel->setChannelKey(modeParams);
 		channel->broadcastMessage("MODE " + channel->getChannelName() + " +k " + client->getNickName());
 	}
-	else if (mode == "+l" && (client->isOperator() == true))
+	else if (mode == "+l" && client->isOperator())
 	{
 		channel->setUserLimit(atoi(modeParams.c_str()));
 		channel->broadcastMessage("MODE " + channel->getChannelName() + " +l " + client->getNickName());
 	}
-	else if (mode == "+o" && (client->isOperator() == true))
+	else if (mode == "+o" && client->isOperator())
 	{
 		Client* targetClient = Server::getInstance()->getClient(modeParams);
 		if (!targetClient)
@@ -115,12 +108,12 @@ void Channel::setUpModeChannel(Channel* channel, Client* client, string& mode, s
 		targetClient->setOperator(true);
 		channel->broadcastMessage("MODE " + channel->getChannelName() + " +o " + targetClient->getNickName());
 	}
-	else if (mode == "+m" && client->isOperator() == true)
+	else if (mode == "+m" && client->isOperator())
 	{
 		channel->setModerated(true);
 		channel->broadcastMessage("MODE " + channel->getChannelName() + " +m " + client->getNickName());
 	}
-	else if (mode == "+n" && (client->isOperator() == true))
+	else if (mode == "+n" && client->isOperator())
 	{
 		channel->setNoExternalMessages(true);
 		channel->broadcastMessage("MODE " + channel->getChannelName() + " +n " + client->getNickName());
@@ -131,27 +124,29 @@ void Channel::setUpModeChannel(Channel* channel, Client* client, string& mode, s
 	}
 }
 
-// Kanalın düşük modlarını ayarlayan fonksiyon
 void Channel::setLowModeChannel(Channel* channel, Client* client, string& mode, string& modeParams)
 {
 	if (!channel || !client)
+	{
 		error(RED, "Channel or Client is null, cannot set mode.", RESET);
-	if (mode == "-k" && (client->isOperator() == true))
+	}
+
+	if (mode == "-k" && client->isOperator())
 	{
 		channel->setChannelKey("");
 		channel->broadcastMessage("MODE " + channel->getChannelName() + " -k " + client->getNickName());
 	}
-	else if (mode == "-l" && (client->isOperator() == true))
+	else if (mode == "-l" && client->isOperator())
 	{
 		channel->setUserLimit(1000);
 		channel->broadcastMessage("MODE " + channel->getChannelName() + " -l " + client->getNickName());
 	}
-	else if (mode == "-n" && (client->isOperator() == true))
+	else if (mode == "-n" && client->isOperator())
 	{
 		channel->setNoExternalMessages(false);
 		channel->broadcastMessage("MODE " + channel->getChannelName() + " -n " + client->getNickName());
 	}
-	else if (mode == "-o" && (client->isOperator() == true))
+	else if (mode == "-o" && client->isOperator())
 	{
 		Client* targetClient = Server::getInstance()->getClient(modeParams);
 		if (!targetClient)
@@ -165,27 +160,25 @@ void Channel::setLowModeChannel(Channel* channel, Client* client, string& mode, 
 			channel->broadcastMessage("MODE " + channel->getChannelName() + " -o " + targetClient->getNickName());
 		}
 	}
-	else if (mode == "-m" && client->isOperator() == true)
+	else if (mode == "-m" && client->isOperator())
 	{
 		channel->setModerated(false);
 		channel->broadcastMessage("MODE " + channel->getChannelName() + " -m " + client->getNickName());
 	}
 	else
+	{
 		client->sendMessage(":" + client->getHostName() + " 501 " + client->getNickName() + " :Unknown MODE flag");
+	}
 }
 
-// Kanaldaki istemcilerin nickName'lerini içeren vektörü döndüren fonksiyon
 std::vector<std::string> Channel::getChannelClientNickNames() const
 {
 	vector<string> nickNames;
 	for (vector<Client*>::const_iterator it = _clients.begin(); it != _clients.end(); ++it)
-	{
 		nickNames.push_back((*it)->getNickName());
-	}
 	return nickNames;
 }
 
-// Kanaldaki mevcut istemcilerin nickName'lerini içeren bir stringi döndüren fonksiyon
 string Channel::getExistingUsersNickList() const
 {
 	string nickList;
@@ -193,7 +186,6 @@ string Channel::getExistingUsersNickList() const
 	{
 		if (it != _clients.begin())
 			nickList += " ";
-
 		nickList += (*it)->getNickName();
 	}
 	return nickList;

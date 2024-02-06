@@ -11,25 +11,27 @@ SRC			=	main.cpp src/Server.cpp src/Client.cpp src/Channel.cpp src/SrvUtils.cpp 
 OBJ			= $(SRC:src/%.cpp=obj/%.o)
 #OBJCOM		= $(SRC:src/Commands/%.cpp=obj/%.o)
 
-all			: $(NAME)
+all		: $(NAME)
 
-$(NAME)		: obj $(OBJ)
+$(NAME)	: obj $(OBJ)
 	@$(CC) $(FLAGS) obj/*.o obj/Commands/*.o main.cpp -o $(NAME)
 	@echo "\033[32mIRCserv \033[0m\033[1;32mCompilation OK\033[0m"
 
-obj			:
+obj		:
 	mkdir -p obj
 	mkdir -p obj/Commands
 
-obj/%.o		: src/%.cpp
+obj/%.o	: src/%.cpp
 	$(CC) $(FLAGS) -c $< -o $@
 
-clean		:
+clean	:
 	@rm -rf log.log
 	@rm -rf error.log
-	@rm -rf $(NAME)
-
-fclean		: clean
 	@rm -rf obj
+	@echo "\033[31mIRCserv objects files removed\033[0m"
 
-re			: clean all
+fclean	: clean
+	@rm -rf $(NAME)
+	@echo "\033[31mIRCserv removed\033[0m"
+
+re		: fclean all

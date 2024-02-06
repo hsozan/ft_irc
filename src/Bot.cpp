@@ -1,6 +1,5 @@
 #include "../include/Bot.hpp"
 
-// Bot sınıfının yapıcı fonksiyonu
 Bot::Bot(const string &serv, int port, const string &pass)
 	: serv(serv),
 	  port(port),
@@ -12,13 +11,11 @@ Bot::Bot(const string &serv, int port, const string &pass)
 	connectServ();
 }
 
-// Bot sınıfının yıkıcı fonksiyonu
 Bot::~Bot()
 {
 	close(sock);
 }
 
-// Sunucuya bağlanan fonksiyon
 void Bot::connectServ()
 {
 	struct sockaddr_in server_addr;
@@ -47,7 +44,6 @@ void Bot::connectServ()
 	}
 }
 
-// Sunucudan gelen mesajları dinleyen fonksiyon
 void Bot::listen()
 {
 	const int BUFFER_SIZE = 1024;
@@ -75,39 +71,40 @@ void Bot::listen()
 	}
 }
 
-// Gelen mesajları işleyen fonksiyon
 void Bot::processMessage(const string &msg)
 {
 	if (msg.find("PRIVMSG") != string::npos)
 	{
 		string senderNick = msg.substr(1, msg.find("!") - 1);
+		
+		if (msg.find("hello") != string::npos)
+			sendMsg(senderNick, "Hello " + senderNick + "!");
+
+		if (msg.find("time") != string::npos || msg.find("date") != string::npos)
 		{
-			if (msg.find("hello") != string::npos)
-				sendMsg(senderNick, "Hello " + senderNick + "!");
-
-			if (msg.find("time") != string::npos || msg.find("date") != string::npos)
-			{
-				time_t rawtime;
-				struct tm *timeinfo;
-				time(&rawtime);
-				timeinfo = localtime(&rawtime);
-				sendMsg(senderNick, asctime(timeinfo));
-			}
-
-			if (msg.find("amk") != string::npos)
-				sendMsg(senderNick, "Saygılı ol lütfen  " + senderNick + "!");
+			time_t rawtime;
+			struct tm *timeinfo;
+			time(&rawtime);
+			timeinfo = localtime(&rawtime);
+			sendMsg(senderNick, asctime(timeinfo));
 		}
+
+		if (msg.find("who are you") != string::npos)
+			sendMsg(senderNick, "I am a bot, I am here to help you.");
+		
+		if (msg.find("what is the meaning of life") != string::npos)
+			sendMsg(senderNick, "42");
+
+		if (msg.find("amk") != string::npos)
+			sendMsg(senderNick, "Saygılı ol lütfen  " + senderNick + "!");
 	}
 }
-
-// Kanala mesaj gönderen fonksiyon
 void Bot::sendMsg(const string &channel, const string &message)
 {
 	string fullMessage = "PRIVMSG " + channel + " :" + message + "\r\n";
 	send(sock, fullMessage.c_str(), fullMessage.length(), 0);
 }
 
-// Sunucuya kayıt mesajı gönderen fonksiyon
 void Bot::sendRegMsg(const string &message)
 {
 	send(sock, message.c_str(), message.length(), 0);
