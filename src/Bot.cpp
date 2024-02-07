@@ -4,7 +4,7 @@ Bot::Bot(const string &serv, int port, const string &pass)
 	: serv(serv),
 	  port(port),
 	  botPass(pass),
-	  nick("GaribanBot"),
+	  nick("Sigabot"),
 	  user("IRC"),
 	  realname("Bot")
 {
