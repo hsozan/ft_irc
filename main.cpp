@@ -4,7 +4,6 @@
 
 int main(int argc, char *argv[])
 {
-
 	//system("leaks Ircserv");
 	if (argc != 3) 
 		return error(RED, "Usage: ./server <port> <password>\n", RESET);
