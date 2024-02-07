@@ -31,6 +31,7 @@ void Mode::mode(Client *client, vector<string> commandParts, Server *srv)
 
         if (mode.empty())
             return;
+        
         if (mode.at(0) == '+')
         {
             if (commandParts.size() > 3)
