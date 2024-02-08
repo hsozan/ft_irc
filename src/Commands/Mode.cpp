@@ -21,7 +21,7 @@ void Mode::mode(Client *client, vector<string> commandParts, Server *srv)
     if (atargetE.at(0) == '#')
     {
         string atarget = atrim(atargetE);
-        Channel *channel = srv->getChannel(atarget);
+        Channel *channel = srv->getChannels(atarget);
 
         if (!channel)
         {

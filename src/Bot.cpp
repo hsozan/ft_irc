@@ -30,7 +30,7 @@ void Bot::connectServ()
 	server_addr.sin_addr = *((struct in_addr *)host->h_addr);
 	memset(&(server_addr.sin_zero), '\0', 8);
 
-	if (connect(sock, (struct sockaddr *)&server_addr, sizeof(struct sockaddr)) == -1)
+	if (connect(sock, reinterpret_cast<struct sockaddr*>(&server_addr), sizeof(struct sockaddr)) == -1)
 		error(RED, FAILED_SOCKET_CONNECT, RESET);
 
 	if (fcntl(sock, F_SETFL, O_NONBLOCK) == -1)

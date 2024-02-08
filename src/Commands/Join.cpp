@@ -39,7 +39,7 @@ void Join::joinChannel(Client* client, string channelName, vector<string> comman
 
     if (srv->channelExists(channelName))
     {
-        channel = srv->getChannel(channelName);
+        channel = srv->getChannels(channelName);
 
         if (channel->isUserOnChannel(client))
         {

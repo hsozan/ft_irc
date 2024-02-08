@@ -68,6 +68,7 @@ void Server::socketInit()
 			serverAddress.sin_addr.s_addr = INADDR_ANY;
 			serverAddress.sin_family = _serverSocketFamily;
 			serverAddress.sin_port = htons(_serverSocketPort);
+			memset(&(serverAddress.sin_zero), '\0', 8);
 			break;
 			
 		default:
