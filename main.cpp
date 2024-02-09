@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
 		return error(RED, "Invalid port number\n", RESET);
 	std::string password = argv[2];
 	try {
-		Server	srv(AF_INET, SOCK_STREAM, port, "Gariban İRC");
+		Server	srv(AF_INET, SOCK_STREAM, port, "HEH IRC Server");
 		srv.setSrvPass(password);
 		srv.serverRun();
 	}

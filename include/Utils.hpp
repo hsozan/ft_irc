@@ -47,9 +47,9 @@ using namespace std;
 #define ERR_NEEDMOREPARAMS(source, command) "461 " + source + " " + command + " :Not enough parameters"
 #define ERR_NOSUCHCHANNEL(source, channel) "403 " + source + " " + channel + " :No such channel"
 #define ERR_USERONCHANNEL(source, channel) "443 " + source + " " + channel + " :is already on channel"
-#define ERR_BADCHANNELKEY(source, channel) "475 " + source + " " + channel + " :Cannot join channel (+k)"
-#define ERR_INVITEONLYCHAN(source, channel) "473 " + source + " " + channel + " :Cannot join channel (+i)"
-#define ERR_CHANNELISFULL(source, channel) "471 " + source + " " + channel + " :Cannot join channel (+l)"
+#define ERR_BADCHANNELKEY(source, channel) "475 " + source + " " + channel + " :Can not join channel (+k)"
+#define ERR_INVITEONLYCHAN(source, channel) "473 " + source + " " + channel + " :Can not join channel (+i)"
+#define ERR_CHANNELISFULL(source, channel) "471 " + source + " " + channel + " :Can not join channel (+l)"
 #define RPL_JOIN(source, channel) ":" + source + " JOIN :" + channel
 #define RPL_ENDOFNAMES(source, channel) "366 " + source + " " + channel + " :End of /NAMES list."
 #define ERR_CHANOPRIVSNEEDED(source, channel) "482 " + source + " " + channel + " :You're not channel operator"
@@ -64,8 +64,8 @@ using namespace std;
 #define ERR_NICKCOLLISION(source, nick) "436 " + source + " " + nick + " :Nickname collision KILL"
 #define ERR_INVALIDCAPCMD(source) "410 " + source + " :Invalid CAP subcommand"
 #define ERR_NOTEXTTOSEND(source) "412 " + source + " :No text to send"
-#define ERR_NOCANNOTSENDTOCHAN(source, channel) "404 " + source + " " + channel + " :Cannot send to channel"
-#define ERR_NOKICKCHANNELOWNER(source, channel) source + " " + channel + " :Cannot kick to channel owner!"
+#define ERR_NOCANNOTSENDTOCHAN(source, channel) "404 " + source + " " + channel + " :Can not send to channel"
+#define ERR_NOKICKCHANNELOWNER(source, channel) source + " " + channel + " :Can not kick to channel owner!"
 
 void log(const string& message);
 void ErrorLogger( string messageInfo, const char* fileInfo, int lineInfo, bool isFatal);

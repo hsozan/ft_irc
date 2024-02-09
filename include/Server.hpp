@@ -69,7 +69,6 @@ class Server
 
 		//SIGNAL
 		static void signalHandler(int signum);
-		static void signalHandlerServer(int signum);
 		void handleClient(int clientSocketFD);
 		static Server* getInstance() {return ins;}
 		static void setInstance(Server* server){ins = server;}

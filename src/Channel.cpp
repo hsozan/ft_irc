@@ -84,7 +84,7 @@ void Channel::setUpModeChannel(Channel* channel, Client* client, string& mode, s
 {
 	if (!channel || !client)
 	{
-		error(RED, "Channel or Client is null, cannot set mode.", RESET);
+		error(RED, "Channel or Client is null, can not set mode.", RESET);
 	}
 
 	if (mode == "+k" && client->isOperator())
@@ -94,8 +94,13 @@ void Channel::setUpModeChannel(Channel* channel, Client* client, string& mode, s
 	}
 	else if (mode == "+l" && client->isOperator())
 	{
-		channel->setUserLimit(atoi(modeParams.c_str()));
-		channel->broadcastMessage("MODE " + channel->getChannelName() + " +l " + client->getNickName());
+		if (atoi(modeParams.c_str()) < 0 || modeParams.empty() || modeParams.find_first_not_of("0123456789") != string::npos)
+		{
+			client->sendMessage(":" + client->getHostName() + " 477 " + client->getNickName() + " " +"Can't set channel limit to " + modeParams + "\r\n");
+			return;
+		}
+		channel->setUserLimit(atoi(modeParams.c_str())); 
+		channel->broadcastMessage("MODE " + channel->getChannelName() + " +l " + modeParams + " " + client->getNickName());
 	}
 	else if (mode == "+o" && client->isOperator())
 	{
@@ -120,7 +125,7 @@ void Channel::setUpModeChannel(Channel* channel, Client* client, string& mode, s
 	}
 	else
 	{
-		client->sendMessage(":" + client->getHostName() + " 501 " + client->getNickName() + " :Unknown MODE flag");
+		client->sendMessage(":" + client->getHostName() + " 501 " + client->getNickName() + " :You're not channel operator\r\n");
 	}
 }
 
@@ -167,7 +172,7 @@ void Channel::setLowModeChannel(Channel* channel, Client* client, string& mode, 
 	}
 	else
 	{
-		client->sendMessage(":" + client->getHostName() + " 501 " + client->getNickName() + " :Unknown MODE flag");
+		client->sendMessage(":" + client->getHostName() + " 501 " + client->getNickName() + " :You're not channel operator");
 	}
 }
 

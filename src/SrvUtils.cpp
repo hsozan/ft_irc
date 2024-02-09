@@ -131,7 +131,6 @@ void Server::signalHandler(int signum)
 void Server::shutdownSrv()
 {
 	std::cout << "Shutting down server..." << std::endl;
-	
 	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); ++it) {
 		Client* client = it->second;
 		if (client != NULL) {

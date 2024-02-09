@@ -11,13 +11,12 @@ Server::Server(int serverSocketFamily, int serverSocketProtocol, int serverSocke
 	_serverPass(""),
 	_bot(NULL)
 {
-	signal(SIGINT, signalHandler);
+	
 	Server::setInstance(this);
 
 	memset(&serverAddress, 0, sizeof(serverAddress));
 
 	FD_ZERO(&read_set);
-
 }
 
 Server::~Server()
@@ -69,7 +68,7 @@ void Server::socketInit()
 			serverAddress.sin_family = _serverSocketFamily;
 			serverAddress.sin_port = htons(_serverSocketPort);
 			break;
-			
+
 		default:
 			close(_serverSocketFD);
 			ErrorLogger(FAILED_SOCKET_DOMAIN, __FILE__, __LINE__, false);
@@ -89,7 +88,7 @@ void Server::socketBind()
 
 void Server::socketListen()
 {
-	if ( listen(_serverSocketFD, BACKLOG_SIZE) == -1 )
+	if (listen(_serverSocketFD, BACKLOG_SIZE) == -1 )
 	{
 		close(_serverSocketFD);
 		ErrorLogger(FAILED_SOCKET_LISTEN, __FILE__, __LINE__, false);
@@ -155,7 +154,6 @@ void Server::serverRun()
 	try
 	{
 		_bot = new Bot("localhost", _serverSocketPort, _serverPass);
-
 	}
 	catch (const std::exception &e)
 	{

@@ -28,7 +28,7 @@ void Nick::nick(Client *client, vector<string> commandParts, Server *srv)
         const Client *regUser = it->second;
         if (!regUser)
             continue;
-        if (regUser != client && regUser->getNickName() == nickName)
+        if (regUser->getNickName() == nickName)
         {
             client->sendReply(ERR_NICKNAMEINUSE(client->getNickName(), nickName));
             return;
