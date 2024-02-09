@@ -29,7 +29,7 @@ void Part::partChannel(Client* client, string channelName, Server* srv)
         return;
     }
 
-    Channel* channel = srv->getChannel(channelName);
+    Channel* channel = srv->getChannels(channelName);
 
     if (!channel)
     {

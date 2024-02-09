@@ -35,7 +35,7 @@ void PrivMsg::privMsg(Client *client, vector<string> commandParts, Server *srv)
 
 void sendChannelMessage(Client *client, string channelName, string message, Server *srv)
 {
-    Channel *channel = srv->getChannel(channelName);
+    Channel *channel = srv->getChannels(channelName);
 
     if (channel == NULL)
     {

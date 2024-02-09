@@ -24,7 +24,7 @@ void Server::removeClientFromAllChannels(Client* client)
 	if (client == NULL || !client->isSocketOpen())
 		return;
 
-	std::vector<Channel*> channels = client->getChannel();
+	std::vector<Channel*> channels = client->getChannels();
 	while (!channels.empty())
 	{
 		Channel* channel = channels.back();
@@ -74,7 +74,7 @@ Client* Server::getClient(string& nickName)
 	return NULL;
 }
 
-Channel* Server::getChannel(string& channelName)
+Channel* Server::getChannels(string& channelName)
 {
 	for (map<string, Channel*>::iterator it = _channels.begin(); it != _channels.end(); ++it)
 	{

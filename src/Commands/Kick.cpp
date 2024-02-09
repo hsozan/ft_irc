@@ -18,7 +18,7 @@ void Kick::kick(Client* client, vector<string> commandParts, Server* srv)
         return;
     }
 
-    Channel* channel = srv->getChannel(channelNamee);
+    Channel* channel = srv->getChannels(channelNamee);
     if (!channel)
     {
         client->sendReply(ERR_NOSUCHCHANNEL(client->getNickName(), channelNamee));

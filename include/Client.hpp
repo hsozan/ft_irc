@@ -87,7 +87,7 @@ public:
 
 	bool isRegistered() const { return _clientStatus == CLIENT_REGISTERED; }
 
-	vector<Channel*> getChannel() const { return _channel; }
+	vector<Channel*> getChannels() const { return _channel; }
 
 	/* SETTERS */
 	void appendtoBuffer( const string& message ) {  buffer.append(message); }

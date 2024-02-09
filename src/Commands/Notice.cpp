@@ -2,7 +2,7 @@
 
 static void sendNoticeChannelMessage(Client *client, string channelName, string message, Server *srv)
 {
-    Channel *channel = srv->getChannel(channelName);
+    Channel *channel = srv->getChannels(channelName);
 
     if (channel == NULL)
     {
