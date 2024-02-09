@@ -4,7 +4,6 @@
 
 int main(int argc, char *argv[])
 {
-	//system("leaks Ircserv");
 	if (argc != 3) 
 		return error(RED, "Usage: ./server <port> <password>\n", RESET);
 	int port = std::atoi(argv[1]);
@@ -19,5 +18,6 @@ int main(int argc, char *argv[])
 	catch (std::exception& e){
 		return error(RED, e.what(), RESET);
 	}
+	//system("leaks Ircserv");
 	return 0;
 }

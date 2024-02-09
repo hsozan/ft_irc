@@ -48,7 +48,6 @@ void Server::processPartialCommands(int clientSocketFD)
 		if (!clientBuffer.find('\n'))
 			clientBuffer.clear();
 	}
-
 	else
 	{
 		while ((endOfCommand = clientBuffer.find("\r\n")) != string::npos)
